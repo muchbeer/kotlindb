@@ -12,13 +12,22 @@ class SchoolService (val db : SchoolDataSource) {
     fun retrieveSchools() : List<Schools>  = db.findAll()
 
     fun retrieveBySchool(schoolID : String) : Schools =
-        db.findByIdOrNull(schoolID) ?: throw NoSuchElementException("Did not find the school with id $schoolID")
+        db.findById(schoolID).orElseThrow {
+
+            NoSuchElementException("Did not find the school with id $schoolID")         }
+
 
     fun saveSchools(schools: Schools) :  Schools =  db.save( schools)
 
     fun updateSchoolById(schoolID: String, schools: Schools) : Schools {
         return if (db.existsById(schoolID)) {
-            db.save( schools )
+            db.save(
+                Schools(
+                    schoolNumber = schools.schoolNumber,
+                    schoolPlace = schools.schoolPlace,
+                    schoolName = schools.schoolName
+                )
+            )
         } else throw NoSuchElementException("No records match the school ID : $schoolID")
     }
 
